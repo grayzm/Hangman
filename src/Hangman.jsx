@@ -54,7 +54,7 @@ export default function Hangman() {
       value={item.value}
       isGuessed={item.isGuessed}
       isCorrect={item.isCorrect}
-      guess={() => guess(item.id)}
+      guess={() => guess(item.id, item.value)}
     />
   ));
 
@@ -64,27 +64,34 @@ export default function Hangman() {
   const row3 = letterEl.slice(19, 26);
 
   function getAnswer() {
-    return words[Math.floor(Math.random() * words.length)];
+    const randomWord = words[Math.floor(Math.random() * words.length)];
+
+    return [...randomWord].map((letter) => ({
+      key: nanoid(3),
+      value: letter.toUpperCase(),
+      isShown: false,
+    }));
   }
 
   const [answer, setAnswer] = React.useState(() => getAnswer());
 
-  console.log([...answer]);
-  const answerObj = [...answer].map((letter) => ({
-    key: nanoid(3),
-    value: letter,
-    isShown: false,
-  }));
+  // const answerObj = [...answer].map((letter) => ({
+  //   key: nanoid(3),
+  //   value: letter.toUpperCase(),
+  //   isShown: false,
+  // }));
 
-  const answerSlot = answerObj.map((answerLetter) => (
+  console.log(answer);
+
+  const answerSlot = answer.map((answerLetter) => (
     <Answer
       key={answerLetter.key}
-      value={answerLetter}
+      value={answerLetter.value}
       isShown={answerLetter.isShown}
     />
   ));
 
-  function guess(id) {
+  function guess(id, value) {
     const clickedLetter = letters.find((item) => item.id === id);
 
     // if it's guessed, stop the function (make it unclickable)
@@ -92,11 +99,27 @@ export default function Hangman() {
       return;
     }
 
+    // check if guess letter is in the answer
+    const isCorrectGuess = answer.some((item) => item.value === value);
+
+    // update keyboard UI
     setLetters((prev) =>
       prev.map((letter) =>
-        letter.id === id ? { ...letter, isGuessed: !letter.isGuessed } : letter,
+        letter.id === id
+          ? { ...letter, isGuessed: true, isCorrect: isCorrectGuess }
+          : letter,
       ),
     );
+
+    if (isCorrectGuess) {
+      setAnswer((prev) =>
+        prev.map((item) =>
+          item.value === value ? { ...item, isShown: true } : item,
+        ),
+      );
+    } else {
+      console.log("wrong guess!");
+    }
 
     console.log(clickedLetter);
   }

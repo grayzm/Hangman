@@ -41,8 +41,11 @@ main p {
   max-width: 40px;
   width: 100%;
   aspect-ratio: 1;
-  /* background-color: blue; */
   border-bottom: 2px solid white;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  font-size: larger;
 
 }
 
