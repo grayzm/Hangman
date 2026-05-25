@@ -1,3 +1,10 @@
 export default function Answer(props) {
-  return <div className="answer-slot">{props.isShown ? props.value : ""}</div>;
+  const shouldReveal = props.isShown || props.gameLost;
+  const isMissed = !props.isShown && props.gameLost;
+
+  return (
+    <div className={`answer-slot ${isMissed ? "revealed-missed" : ""}`}>
+      {shouldReveal ? props.value : ""}
+    </div>
+  );
 }

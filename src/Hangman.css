@@ -91,6 +91,10 @@ header p {
   font-size: larger;
 }
 
+.answer-slot.revealed-missed {
+  color: #ee5253;
+}
+
 /* ========== KEYBOARD ========== */
 .keyboard-container {
   display: flex;

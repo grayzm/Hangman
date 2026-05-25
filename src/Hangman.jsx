@@ -7,11 +7,13 @@ import Answer from "./components/Answer.jsx";
 import Hostages from "./components/Hostages.jsx";
 import Duck from "./components/Duck.jsx";
 import JSConfetti from "js-confetti";
+import clickMp3 from "./sounds/click.mp3"
+import partyHornMp3 from "./sounds/party-horn.mp3"
 
 const jsConfetti = new JSConfetti();
 
-const clickSound = new Audio("/click.mp3");
-const partyHorn = new Audio("/party-horn.mp3");
+const clickSound = new Audio(clickMp3);
+const partyHorn = new Audio(partyHornMp3);
 
 // create array of the alphabet
 const alphabet = [
@@ -91,14 +93,6 @@ export default function Hangman() {
 
   // render each letter in letters
   const letterEl = letters.map((item) => {
-    // const letterColorIfGuessed = item.isCorrect ? "1dd1a1" : "ee5253";
-    // const matchingHostage = hostages.find(
-    //   (h) => h.color === letterColorIfGuessed,
-    // );
-    // const isMatchingHostageKilled = matchingHostage
-    //   ? matchingHostage.isKilled
-    //   : false;
-
     return (
       <Letters
         key={item.id}
@@ -106,7 +100,6 @@ export default function Hangman() {
         isGuessed={item.isGuessed}
         isCorrect={item.isCorrect}
         guess={() => guess(item.id, item.value)}
-        // isHostageKilled={isMatchingHostageKilled}
       />
     );
   });
@@ -115,6 +108,33 @@ export default function Hangman() {
   const row1 = letterEl.slice(0, 10);
   const row2 = letterEl.slice(10, 19);
   const row3 = letterEl.slice(19, 26);
+
+  React.useEffect(() => {
+    const unlockAudio = () => {
+      // play the soound and immediately pause/reset it
+      clickSound
+        .play()
+        .then(() => {
+          clickSound.pause();
+          clickSound.currentTime = 0;
+
+          // remove listeners so they don't run again
+          window.removeEventListener("click", unlockAudio);
+          window.removeEventListener("touchstart", unlockAudio);
+        })
+        .catch((err) => {
+          console.log("Audio waiting for use interaction...", err);
+        });
+    };
+
+    window.addEventListener("click", unlockAudio);
+    window.addEventListener("touchstart", unlockAudio);
+
+    return () => {
+      window.removeEventListener("click", unlockAudio);
+      window.removeEventListener("touchstart", unlockAudio);
+    };
+  }, []);
 
   function getAnswer() {
     const randomWord = words[Math.floor(Math.random() * words.length)];
@@ -130,19 +150,20 @@ export default function Hangman() {
 
   console.log(answer);
 
+  const gameLost = hostages.every((item) => item.isKilled);
+
   const answerSlot = answer.map((answerLetter) => (
     <Answer
       key={answerLetter.key}
       value={answerLetter.value}
       isShown={answerLetter.isShown}
+      gameLost={gameLost}
     />
   ));
 
   const gameWon =
     answerSlot.every((item) => item.isShown) &&
     hostages.some((item) => !item.isKilled);
-
-  const gameLost = hostages.every((item) => item.isKilled);
 
   function newGame() {
     clickSound.currentTime = 0;
