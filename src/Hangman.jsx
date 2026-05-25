@@ -5,7 +5,7 @@ import Letters from "./components/Letters";
 import { words } from "./contents/words";
 import Answer from "./components/Answer";
 import Hostages from "./components/Hostages";
-import Duck from "./components/Duck"
+import Duck from "./components/Duck";
 
 // create array of the alphabet
 const alphabet = [
@@ -46,15 +46,15 @@ const generateKeys = alphabet.map((letter) => ({
 }));
 
 const hostageData = [
-  "#ee5253",
   "#ff9f43",
-  "#54a0ff",
   "#ff9ff3",
   "#1dd1a1",
   "#5f27cd",
+  "#54a0ff",
+  "#ee5253",
   "#ff7f00",
   "#ffd700",
-  "#000"
+  "#000",
 ].map((color) => ({
   id: nanoid(3),
   color: color,
@@ -80,15 +80,26 @@ export default function Hangman() {
   });
 
   // render each letter in letters
-  const letterEl = letters.map((item) => (
-    <Letters
-      key={item.id}
-      value={item.value}
-      isGuessed={item.isGuessed}
-      isCorrect={item.isCorrect}
-      guess={() => guess(item.id, item.value)}
-    />
-  ));
+  const letterEl = letters.map((item) => {
+    // const letterColorIfGuessed = item.isCorrect ? "1dd1a1" : "ee5253";
+    // const matchingHostage = hostages.find(
+    //   (h) => h.color === letterColorIfGuessed,
+    // );
+    // const isMatchingHostageKilled = matchingHostage
+    //   ? matchingHostage.isKilled
+    //   : false;
+
+    return (
+      <Letters
+        key={item.id}
+        value={item.value}
+        isGuessed={item.isGuessed}
+        isCorrect={item.isCorrect}
+        guess={() => guess(item.id, item.value)}
+        // isHostageKilled={isMatchingHostageKilled}
+      />
+    );
+  });
 
   // divide letters into rows
   const row1 = letterEl.slice(0, 10);
@@ -125,13 +136,16 @@ export default function Hangman() {
     />
   ));
 
+  const hostageRow1 = hostageEl.slice(0, 5);
+  const hostageRow2 = hostageEl.slice(5, 9);
+
   function killHostage(count) {
-      setHostages((prev) =>
-        prev.map((hostage, index) =>
-          index === count ? { ...hostage, isKilled: true } : hostage
-        ),
-      );
-    }
+    setHostages((prev) =>
+      prev.map((hostage, index) =>
+        index === count ? { ...hostage, isKilled: true } : hostage,
+      ),
+    );
+  }
 
   function guess(id, value) {
     const clickedLetter = letters.find((item) => item.id === id);
@@ -162,45 +176,49 @@ export default function Hangman() {
     } else {
       console.log("wrong guess!");
 
-      killHostage(wrongGuess)
+      killHostage(wrongGuess);
 
       const colorOrder = [
-        "red",
         "orange2",
-        "blue",
         "pink",
         "green",
         "purple",
+        "blue",
+        "red",
         "orange",
         "yellow",
-        "black"
-      ]
+        "black",
+      ];
 
-      const colorToHide = colorOrder[wrongGuess]
+      const colorToHide = colorOrder[wrongGuess];
 
       if (colorToHide) {
         setVisible((prev) => ({
-          ...prev, 
-          [colorToHide]: false
-        }))
+          ...prev,
+          [colorToHide]: false,
+        }));
       }
 
-      setWrongGuess(prevCount => prevCount + 1);
+      setWrongGuess((prevCount) => prevCount + 1);
     }
   }
 
   return (
     <main>
-      <h1>Game Title</h1>
-      <p>Guess the word before you go color blind! 🥸</p>
-      <Duck visible={visible}/>
-      <div className="hostage-container">{hostageEl}</div>
+      <h1>Da Duck</h1>
+      <p>Guess the word and save da duck<br></br>from getting grayscaled!! 🐥</p>
+      <Duck visible={visible} />
+      <div className="hostage-container">
+        <div className="hostage-row">{hostageRow1}</div>
+        <div className="hostage-row">{hostageRow2}</div>
+      </div>
       <div className="answer-container">{answerSlot}</div>
       <div className="keyboard-container">
         <div className="keyboard-row">{row1}</div>
         <div className="keyboard-row">{row2}</div>
         <div className="keyboard-row">{row3}</div>
       </div>
+      <button>New Game!</button>
     </main>
   );
 }

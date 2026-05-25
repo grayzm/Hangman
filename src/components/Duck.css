@@ -10,6 +10,7 @@
     width: 100%;
     max-width: 200px;
     aspect-ratio: 15 / 15;
+    padding: 12px;
 }
 
 .pixel {
@@ -20,7 +21,7 @@
 
 .pixel.grayscale {
     filter: grayscale(100%);
-    opacity: 0.3;
+    opacity: 0.7;
 }
 
 .pixel.empty { background-color: transparent; }
