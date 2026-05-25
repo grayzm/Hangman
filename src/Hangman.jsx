@@ -6,8 +6,12 @@ import { words } from "./contents/words";
 import Answer from "./components/Answer";
 import Hostages from "./components/Hostages";
 import Duck from "./components/Duck";
+import JSConfetti from "js-confetti";
+
+const jsConfetti = new JSConfetti();
 
 const clickSound = new Audio("/click.mp3");
+const partyHorn = new Audio("/party-horn.mp3");
 
 // create array of the alphabet
 const alphabet = [
@@ -219,6 +223,15 @@ export default function Hangman() {
       const isWordComplete = updatedAnswer.every((item) => item.isShown);
       if (isWordComplete) {
         console.log("Game Won! Streak broken.");
+        partyHorn.currentTime = 0;
+        partyHorn
+          .play()
+          .catch((err) => console.log("Audio playback interrupted:", err));
+        jsConfetti.addConfetti({
+          emojis: ["🐥", "🐣", "💛"],
+          emojiSize: 50,
+          confettiNumber: 100,
+        });
         setLostCount(0);
       }
     } else {
