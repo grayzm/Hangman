@@ -7,6 +7,8 @@ import Answer from "./components/Answer";
 import Hostages from "./components/Hostages";
 import Duck from "./components/Duck";
 
+const clickSound = new Audio("/click.mp3");
+
 // create array of the alphabet
 const alphabet = [
   "Q",
@@ -66,7 +68,6 @@ export default function Hangman() {
   const [letters, setLetters] = React.useState(generateKeys);
   const [wrongGuess, setWrongGuess] = React.useState(0);
   const [hostages, setHostages] = React.useState(hostageData);
-
   const [visible, setVisible] = React.useState({
     black: true,
     orange: true,
@@ -78,6 +79,11 @@ export default function Hangman() {
     blue: true,
     green: true,
   });
+  const [lostCount, setLostCount] = React.useState(0);
+  const streakMessage =
+    lostCount >= 5
+      ? "Oof! You've failed to guess the word 5 times in a row. Da duck is disappointed. Da duck doesn't want to play anymore."
+      : "";
 
   // render each letter in letters
   const letterEl = letters.map((item) => {
@@ -128,6 +134,35 @@ export default function Hangman() {
     />
   ));
 
+  const gameWon =
+    answerSlot.every((item) => item.isShown) &&
+    hostages.some((item) => !item.isKilled);
+
+  const gameLost = hostages.every((item) => item.isKilled);
+
+  function newGame() {
+    clickSound.currentTime = 0;
+    clickSound
+      .play()
+      .catch((err) => console.log("Audio playback interrupted:", err));
+
+    setLetters(generateKeys);
+    setAnswer(getAnswer());
+    setHostages(hostageData);
+    setWrongGuess(0);
+    setVisible({
+      black: true,
+      orange: true,
+      yellow: true,
+      orange2: true,
+      red: true,
+      pink: true,
+      purple: true,
+      blue: true,
+      green: true,
+    });
+  }
+
   const hostageEl = hostages.map((hostage) => (
     <Hostages
       key={hostage.id}
@@ -148,10 +183,14 @@ export default function Hangman() {
   }
 
   function guess(id, value) {
+    clickSound.currentTime = 0;
+    clickSound
+      .play()
+      .catch((err) => console.log("Audio playback interrupted:", err));
     const clickedLetter = letters.find((item) => item.id === id);
 
     // if it's guessed, stop the function (make it unclickable)
-    if (clickedLetter.isGuessed) {
+    if (clickedLetter.isGuessed || gameWon || gameLost) {
       return;
     }
 
@@ -168,11 +207,20 @@ export default function Hangman() {
     );
 
     if (isCorrectGuess) {
-      setAnswer((prev) =>
-        prev.map((item) =>
-          item.value === value ? { ...item, isShown: true } : item,
-        ),
+      // setAnswer((prev) =>
+      //   prev.map((item) =>
+      //     item.value === value ? { ...item, isShown: true } : item,
+      //   ),
+      // );
+      const updatedAnswer = answer.map((item) =>
+        item.value === value ? { ...item, isShown: true } : item,
       );
+      setAnswer(updatedAnswer);
+      const isWordComplete = updatedAnswer.every((item) => item.isShown);
+      if (isWordComplete) {
+        console.log("Game Won! Streak broken.");
+        setLostCount(0);
+      }
     } else {
       console.log("wrong guess!");
 
@@ -199,14 +247,23 @@ export default function Hangman() {
         }));
       }
 
+      if (wrongGuess === 8) {
+        console.log("Game Lost!");
+        setLostCount((prev) => prev + 1);
+      }
+
       setWrongGuess((prevCount) => prevCount + 1);
     }
   }
 
   return (
     <main>
-      <h1>Da Duck</h1>
-      <p>Guess the word and save da duck<br></br>from getting grayscaled!! 🐥</p>
+      <header>
+        <h1>Da Duck</h1>
+        <p>
+          Guess the word and save da duck<br></br>from getting grayscaled!! 🐥
+        </p>
+      </header>
       <Duck visible={visible} />
       <div className="hostage-container">
         <div className="hostage-row">{hostageRow1}</div>
@@ -218,7 +275,15 @@ export default function Hangman() {
         <div className="keyboard-row">{row2}</div>
         <div className="keyboard-row">{row3}</div>
       </div>
-      <button>New Game!</button>
+      <div className="streak-container">
+        <strong>Lost streak: {lostCount}</strong>
+        {streakMessage && <p className="streak-message">{streakMessage}</p>}
+      </div>
+      {!streakMessage && (
+        <div className="button-container">
+          <button onClick={newGame}>New Game!</button>
+        </div>
+      )}
     </main>
   );
 }

@@ -1,5 +1,5 @@
 export default function Letters(props) {
-  let bgColor = "#cfcfcf";
+  let bgColor = "#ffffff";
 
   if (props.isGuessed) {
     bgColor = props.isCorrect ? "#1dd1a1" : "#ee5253";
