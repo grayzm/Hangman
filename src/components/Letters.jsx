@@ -2,7 +2,7 @@ export default function Letters(props) {
   let bgColor = "#e0e0e0";
 
   if (props.isGuessed) {
-    bgColor = props.isCorrect ? "green" : "red";
+    bgColor = props.isCorrect ? "#1dd1a1" : "#ee5253";
   }
 
   const styles = {

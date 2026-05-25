@@ -21,10 +21,33 @@ main {
 
 main h1 {
   color: white;
+  margin-bottom: 8px;
 }
 
 main p {
   color: white;
+  margin-bottom: 16px;
+}
+
+/* ========== HOSTAGES ========== */
+.hostage-container {
+  display: flex;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+.hostages {
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.killed {
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  filter: grayscale(100%);
+  opacity: 0.3;
 }
 
 /* ========== ANSWER SLOT ========== */
@@ -46,7 +69,6 @@ main p {
   align-items: center;
   justify-content: center;
   font-size: larger;
-
 }
 
 /* ========== KEYBOARD ========== */

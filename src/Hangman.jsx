@@ -4,6 +4,8 @@ import { nanoid } from "nanoid";
 import Letters from "./components/Letters";
 import { words } from "./contents/words";
 import Answer from "./components/Answer";
+import Hostages from "./components/Hostages";
+import Duck from "./components/Duck"
 
 // create array of the alphabet
 const alphabet = [
@@ -43,9 +45,39 @@ const generateKeys = alphabet.map((letter) => ({
   isCorrect: false,
 }));
 
+const hostageData = [
+  "#ee5253",
+  "#ff9f43",
+  "#54a0ff",
+  "#ff9ff3",
+  "#1dd1a1",
+  "#5f27cd",
+  "#ff7f00",
+  "#ffd700",
+  "#000"
+].map((color) => ({
+  id: nanoid(3),
+  color: color,
+  isKilled: false,
+}));
+
 export default function Hangman() {
   // initialize the keys
   const [letters, setLetters] = React.useState(generateKeys);
+  const [wrongGuess, setWrongGuess] = React.useState(0);
+  const [hostages, setHostages] = React.useState(hostageData);
+
+  const [visible, setVisible] = React.useState({
+    black: true,
+    orange: true,
+    yellow: true,
+    orange2: true,
+    red: true,
+    pink: true,
+    purple: true,
+    blue: true,
+    green: true,
+  });
 
   // render each letter in letters
   const letterEl = letters.map((item) => (
@@ -75,12 +107,6 @@ export default function Hangman() {
 
   const [answer, setAnswer] = React.useState(() => getAnswer());
 
-  // const answerObj = [...answer].map((letter) => ({
-  //   key: nanoid(3),
-  //   value: letter.toUpperCase(),
-  //   isShown: false,
-  // }));
-
   console.log(answer);
 
   const answerSlot = answer.map((answerLetter) => (
@@ -90,6 +116,22 @@ export default function Hangman() {
       isShown={answerLetter.isShown}
     />
   ));
+
+  const hostageEl = hostages.map((hostage) => (
+    <Hostages
+      key={hostage.id}
+      color={hostage.color}
+      isKilled={hostage.isKilled}
+    />
+  ));
+
+  function killHostage(count) {
+      setHostages((prev) =>
+        prev.map((hostage, index) =>
+          index === count ? { ...hostage, isKilled: true } : hostage
+        ),
+      );
+    }
 
   function guess(id, value) {
     const clickedLetter = letters.find((item) => item.id === id);
@@ -119,16 +161,40 @@ export default function Hangman() {
       );
     } else {
       console.log("wrong guess!");
-    }
 
-    console.log(clickedLetter);
+      killHostage(wrongGuess)
+
+      const colorOrder = [
+        "red",
+        "orange2",
+        "blue",
+        "pink",
+        "green",
+        "purple",
+        "orange",
+        "yellow",
+        "black"
+      ]
+
+      const colorToHide = colorOrder[wrongGuess]
+
+      if (colorToHide) {
+        setVisible((prev) => ({
+          ...prev, 
+          [colorToHide]: false
+        }))
+      }
+
+      setWrongGuess(prevCount => prevCount + 1);
+    }
   }
 
   return (
     <main>
       <h1>Game Title</h1>
-      <p>Guess the word within 8 attempts blablabla</p>
-      <div>Hostages here</div>
+      <p>Guess the word before you go color blind! 🥸</p>
+      <Duck visible={visible}/>
+      <div className="hostage-container">{hostageEl}</div>
       <div className="answer-container">{answerSlot}</div>
       <div className="keyboard-container">
         <div className="keyboard-row">{row1}</div>
