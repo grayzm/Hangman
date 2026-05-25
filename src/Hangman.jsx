@@ -1,11 +1,11 @@
 import React from "react";
 import "./Hangman.css";
 import { nanoid } from "nanoid";
-import Letters from "./components/Letters";
-import { words } from "./contents/words";
-import Answer from "./components/Answer";
-import Hostages from "./components/Hostages";
-import Duck from "./components/Duck";
+import Letters from "./components/Letters.jsx";
+import { words } from "./contents/words.js";
+import Answer from "./components/Answer.jsx";
+import Hostages from "./components/Hostages.jsx";
+import Duck from "./components/Duck.jsx";
 import JSConfetti from "js-confetti";
 
 const jsConfetti = new JSConfetti();
